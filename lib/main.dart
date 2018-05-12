@@ -1,9 +1,11 @@
 import 'package:f64_flutter/Post.dart';
+import 'package:f64_flutter/colors.dart';
+import 'package:f64_flutter/detail.screen.dart';
+import 'package:f64_flutter/styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'colors.dart' as Theme;
 
 void main() => runApp(new MyApp());
 
@@ -33,7 +35,7 @@ class RandomWordsState extends State<RandomWords>
     super.initState();
   }
 
-  Widget _buildSuggestions() {
+  Widget _buildTabs() {
     return new DefaultTabController(
       length: 2,
       child: new Scaffold(
@@ -52,10 +54,10 @@ class RandomWordsState extends State<RandomWords>
         body: new TabBarView(
           children: [
             new ListView.builder(itemBuilder: (context, i) {
-              return _buildRow();
+              return _buildListItem();
             }),
             new ListView.builder(itemBuilder: (context, i) {
-              return _buildRow();
+              return _buildListItem();
             })
           ],
         ),
@@ -63,50 +65,59 @@ class RandomWordsState extends State<RandomWords>
     );
   }
 
-  Widget _buildRow() {
-    return new Column(children: <Widget>[
-      new Container(
-        decoration: new BoxDecoration(
-            image: new DecorationImage(
-          fit: BoxFit.fitWidth,
-          alignment: FractionalOffset.center,
-          image: new NetworkImage(
-              'https://www.dropbox.com/s/m33j376w3pat6h6/serveimage.jpeg?dl=1'),
-        )),
-        width: MediaQuery.of(context).size.width,
-        height: 200.0,
-      ),
-      new Container(
-        color: new Color(0xFFA1E4FA),
-        height: 10.0,
-        width: MediaQuery.of(context).size.width,
-      ),
-      new Container(
-          margin: const EdgeInsets.all(8.0),
-          child: new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              new Text("FASHION",
-                  style: new TextStyle(color: Theme.Colors.MAIN_INFO_TEXT)),
-              new Text("3 MINS. READ",
-                  style: new TextStyle(color: Theme.Colors.MAIN_INFO_TEXT)),
-            ],
+  Widget _buildListItem() {
+    var imageUrl =
+        'https://sun9-5.userapi.com/c840327/v840327006/6093e/odrhYhf7i8w.jpg';
+    return new InkWell(
+      child: new Column(children: <Widget>[
+        new Container(
+          decoration: new BoxDecoration(
+              image: new DecorationImage(
+            fit: BoxFit.fitWidth,
+            alignment: FractionalOffset.center,
+            image: new NetworkImage(imageUrl),
           )),
-      new Container(
-          margin: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: new Text(
-            "Новый кампэйн Gucci. Glen Luchford переосмысливает понятие моды.",
-            style: new TextStyle(fontSize: 20.0, color: Colors.black),
-          )),
-    ]);
+          width: MediaQuery.of(context).size.width,
+          height: 200.0,
+        ),
+        new Container(
+          color: new Color(0xFFA1E4FA),
+          height: 10.0,
+          width: MediaQuery.of(context).size.width,
+        ),
+        new Container(
+            margin: const EdgeInsets.all(8.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                new Text("FASHION",
+                    style: new TextStyle(color: FColors.MAIN_INFO_TEXT)),
+                new Text("3 MINS. READ", style: Styles.TIME_TO_READ),
+              ],
+            )),
+        new Container(
+            margin: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: new Text(
+              "Новый кампэйн Gucci. Glen Luchford переосмысливает понятие моды.",
+              style: Styles.TITLE,
+            )),
+      ]),
+      onTap: () {
+        Navigator.push(
+          context,
+          new MaterialPageRoute(builder: (context) => new DetailScreen()),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    var _applicationName = 'F';
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          'F',
+          _applicationName,
           style: new TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
@@ -114,28 +125,42 @@ class RandomWordsState extends State<RandomWords>
       body: new TabBarView(
         controller: _controller,
         children: [
-          new Container(child: _buildSuggestions()),
+          new Container(child: _buildTabs()),
           new Container(color: Colors.black),
         ],
       ),
-      bottomNavigationBar: new BottomNavigationBar(
-        onTap: (int value) {
-          _controller.animateTo(value);
-          setState(() {
-            _tab = value;
-          });
-        },
-        currentIndex: _tab,
-        items: <BottomNavigationBarItem>[
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.home),
-            title: new Text('READ'),
-          ),
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.notifications),
-            title: new Text('WATCH'),
-          ),
-        ],
+      bottomNavigationBar: new Theme(
+        data: Theme.of(context).copyWith(
+              canvasColor: Colors.black,
+            ),
+        child: new BottomNavigationBar(
+          onTap: (int value) {
+            _controller.animateTo(value);
+            setState(() {
+              _tab = value;
+            });
+          },
+          currentIndex: _tab,
+          type: BottomNavigationBarType.fixed,
+          items: <BottomNavigationBarItem>[
+            new BottomNavigationBarItem(
+              icon: _tab == 0
+                  ? new Icon(Icons.home, color: Colors.white)
+                  : new Icon(Icons.home, color: Colors.grey),
+              title: _tab == 0
+                  ? new Text('READ', style: new TextStyle(color: Colors.white))
+                  : new Text('READ', style: new TextStyle(color: Colors.grey)),
+            ),
+            new BottomNavigationBarItem(
+              icon: _tab == 1
+                  ? new Icon(Icons.notifications, color: Colors.white)
+                  : new Icon(Icons.notifications, color: Colors.grey),
+              title: _tab == 1
+                  ? new Text('WATCH', style: new TextStyle(color: Colors.white))
+                  : new Text('WATCH', style: new TextStyle(color: Colors.grey)),
+            ),
+          ],
+        ),
       ),
     );
   }
